@@ -1,59 +1,28 @@
 # Football Club Analyser
 
-An ETL pipeline that automates club squad and transfer analysis on Transfermarkt data, built with Python, SQL and DuckDB.
+Work in progress. A pipeline in Python, SQL and DuckDB that recreates the club analysis I did by hand during my scouting internship (squad age structure, minutes, foreign players, transfers), so it can run for any club or league at once.
 
-**Status: in progress.** Extract and load steps work; SQL transformations, data validation and reporting are next.
+## Done so far
 
-## Why
+* `src/download.py` downloads the [transfermarkt-datasets](https://github.com/dcaribou/transfermarkt-datasets) package and unpacks the CSVs
+* `src/load.py` loads all tables into DuckDB (1.89M appearances, 89k games, 796 clubs)
+* `notebooks/explore.ipynb` first look at the data in SQL
 
-During my internship as a scouting and data analyst I analysed clubs by hand: squad age structure, minutes distribution, foreign players and transfer activity. One club took hours of copying numbers from Transfermarkt into spreadsheets. This project turns that manual procedure into a reproducible pipeline that can analyse any club, or a whole league, in one run.
+## Next
 
-## Pipeline
+* SQL layers: staging (cleaned tables) and marts (club metrics)
+* data quality checks
+* a report script: pick a league and season, get a comparison table and charts
 
-```
-download.py  ->  data/raw/*.csv  ->  load.py  ->  DuckDB (raw)  ->  SQL: staging  ->  SQL: marts  ->  report
-   Extract                            Load                          Transform
-```
+## Notes on the data
 
-| Step | What it does | Status |
-|---|---|---|
-| Extract | `src/download.py` downloads the public transfermarkt-datasets package and unpacks the raw CSV files | Done |
-| Load | `src/load.py` loads every raw table into a local DuckDB database (`raw` schema) | Done |
-| Explore | `notebooks/explore.ipynb`: profiling tables, row counts, coverage checks in SQL | In progress |
-| Transform | Layered SQL models: `staging` (cleaned, typed) and `marts` (club level metrics) | Next |
-| Validate | Data quality checks: missing birth dates, duplicates, more than 90 minutes per player per match | Planned |
-| Report | `report.py`: league and season in, comparison table (CSV) and charts out | Planned |
+* The source stopped updating in July 2026, so 2025/26 is the last full season.
+* There are about 21 appearances per game on average, fewer than the 26 to 28 players who usually play. Some lineups seem incomplete, probably cup and lower league games. To check in the validation step.
 
-## Data
-
-Source: [transfermarkt-datasets](https://github.com/dcaribou/transfermarkt-datasets) by dcaribou (public, no API key needed).
-
-Loaded so far: 1.89M player appearances, 89k games, 796 clubs, 65 competitions, plus players, transfers and market valuations.
-
-Known limitations, found while exploring:
-
-* Updates of the source are paused; data ends in July 2026, so the 2025/26 season is the latest complete one.
-* Average of about 21 recorded appearances per game, below the 26 to 28 players who usually take part, which suggests incomplete lineups for some games (likely cup and lower league matches). This will be covered by the validation step.
-* Coverage is limited to selected leagues, not every competition.
-
-## Planned metrics (marts)
-
-* Share of minutes played by U23 and 30+ players per club and season
-* Number and origin of foreign players
-* Incoming and outgoing transfers by age bracket, with fees and market values
-
-## How to run
+## Run
 
 ```bash
-git clone https://github.com/macieksochacki/football-club-analyser.git
-cd football-club-analyser
 pip install duckdb pandas matplotlib
-python src/download.py   # Extract: downloads and unpacks the data (a few hundred MB)
-python src/load.py       # Load: builds data/football.duckdb
+python src/download.py
+python src/load.py
 ```
-
-Raw data and the database are not stored in the repo (see `.gitignore`); the scripts recreate them.
-
-## Tech
-
-Python, pandas, DuckDB, SQL, Jupyter, Git
