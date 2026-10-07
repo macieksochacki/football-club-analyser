@@ -17,7 +17,8 @@ Work in progress. A pipeline in Python, SQL and DuckDB that recreates the club a
 ## Notes on the data
 
 * The source stopped updating in July 2026, so 2025/26 is the last full season.
-* There are about 21 appearances per game on average, fewer than the 26 to 28 players who usually play. Some lineups seem incomplete, probably cup and lower league games. To check in the validation step.
+* Ekstraklasa is listed in the competitions and games tables, but has no records in appearances, so player level metrics (minutes, age structure) can't be calculated for Polish clubs from this source.
+* There are about 21 appearances per game on average, fewer than the 26 to 28 players who usually play. Missing lineups like the Ekstraklasa ones are a likely cause. To check in the validation step.
 
 ## Run
 
