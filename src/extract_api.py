@@ -8,21 +8,25 @@ import duckdb
 load_dotenv()
 api_key = os.getenv("FOOTBALL_DATA_API_KEY")
 
-url = "https://api.football-data.org/v4/competitions/PL/standings"
-headers = {"X-Auth-Token": api_key}
-response = requests.get(url, headers=headers)
-print(response.status_code)
+def fetch_standings(code):
+    url = f"https://api.football-data.org/v4/competitions/{code}/standings"
+    headers = {"X-Auth-Token": api_key}
+    response = requests.get(url, headers=headers)
+    print(response.status_code)
 
-data = response.json()
+    data = response.json()
 
-standings = data["standings"]
-first = standings[0]
-table = first["table"]
+    standings = data["standings"]
+    first = standings[0]
+    table = first["table"]
 
-df = pd.json_normalize(table)
-df.columns = df.columns.str.replace(".", "_", regex=False)
-print(df.shape)
-print(df.columns.tolist())
+    df = pd.json_normalize(table)
+    df.columns = df.columns.str.replace(".", "_", regex=False)
+    print(df.shape)
+    print(df.columns.tolist())
+    df["competition"] = code
+    return df
+df = fetch_standings("PL")
 
 Path("data").mkdir(exist_ok=True)
 
