@@ -12,7 +12,7 @@ def fetch_standings(code):
     url = f"https://api.football-data.org/v4/competitions/{code}/standings"
     headers = {"X-Auth-Token": api_key}
     response = requests.get(url, headers=headers)
-    print(response.status_code)
+    response.raise_for_status()
 
     data = response.json()
 
@@ -22,10 +22,9 @@ def fetch_standings(code):
 
     df = pd.json_normalize(table)
     df.columns = df.columns.str.replace(".", "_", regex=False)
-    print(df.shape)
-    print(df.columns.tolist())
     df["competition"] = code
     return df
+
 df = fetch_standings("PL")
 
 Path("data").mkdir(exist_ok=True)
